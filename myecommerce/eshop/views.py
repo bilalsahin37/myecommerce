@@ -7,18 +7,26 @@ from .forms import OrderForm,ProductForm,CustomUserCreationForm,AuthenticationFo
 import logging
 logger=logging.getLogger(__name__)
 
+
+
 def product_list(request):
     products=Product.objects.filter(available=True)
     return render(request,'eshop/product_list.html',{'products': products})
+
+
 
 def product_list_by_category(request,category_id):
     category=get_object_or_404(Category,id=category_id)
     products= category.products.filter(available=True)
     return render(request, 'eshop/product_list.html',{'category':category,'products':products})
 
+
+
 def product_detail(request,id):
     product=get_object_or_404(Product , id=id,available=True)
     return render(request,'eshop/product_detail.html',{'product':product})
+
+
 
 def add_product(request):
     if request.method == 'POST':
@@ -34,12 +42,16 @@ def add_product(request):
     
     return render(request, 'eshop/add_product.html',{'form':form})            
 
+
+
 def product_delete(request,id):
     product=get_object_or_404(Product,id=id)
     if request.method == 'POST':
         product.delete()
         return redirect('product_list')
     return redirect('product_list')
+
+
 
 def add_category(request):
     if request.method == 'POST':
@@ -53,9 +65,13 @@ def add_category(request):
     
     return render(request,'eshop/add_category.html',{'form':form})
 
+
+
 def cart_detail(request):
     cart,created=Cart.objects.get_or_create(session_key=request.session.session_key)
     return render(request, 'eshop/cart_detail.html',{'cart':cart})
+
+
 
 def cart_add(request,product_id):
     cart,created =Cart.objects.get_or_create(session_key=request.session.session_key)
@@ -65,6 +81,8 @@ def cart_add(request,product_id):
     messages.success(request,'The product has been added to the cart.')
     return redirect('cart_detail')
 
+
+
 def cart_remove(request,product_id):
     cart=Cart.objects.get(session_key=request.session.session_key)
     product=get_object_or_404(Product,id=product_id)
@@ -72,6 +90,8 @@ def cart_remove(request,product_id):
     cart_item.delete()
     messages.success(request,'The product has been removed from the cart.')
     return redirect('cart_detail')
+
+
 
 def cart_update(request):
     if request.method == 'POST':
@@ -87,6 +107,8 @@ def cart_update(request):
                 messages.success(request, f'Updated quantity for {product.name}')
         return redirect('cart_detail')
     return redirect('cart_detail')
+
+
 
 def checkout(request):
     try:
@@ -121,9 +143,13 @@ def checkout(request):
     
     return render(request,'eshop/checkout.html',{'cart':cart,'form':form})
 
+
+
 def orders_list(request):
     orders=Order.objects.prefetch_related('items__product').all()
     return render(request,'eshop/orders_list.html',{'orders':orders})
+
+
 
 def register(request):
     if request.method == 'POST':
@@ -136,11 +162,13 @@ def register(request):
             if user is not None:
                 auth_login(request, user)
                 messages.success(request, f'Account created for {username}!')
-                return redirect('product_list')                                
+                return redirect('product_list')
     else:
         form = CustomUserCreationForm()  # only initialize here
     
     return render(request, 'eshop/register.html', {'form': form})
+
+
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -160,8 +188,10 @@ def login_view(request):
     
     return render(request, 'eshop/login.html', {'form': form})
 
+
+
 @login_required
 def logout_view(request):
     logout(request)
     messages.info(request,'You have been logged out.')
-    return redirect('product_list')                       
+    return redirect('product_list')
