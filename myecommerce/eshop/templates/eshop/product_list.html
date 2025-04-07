@@ -1,11 +1,15 @@
 {% extends "eshop/base_generic.html" %}
 
+
+
 {% block content %}
 <h1>Products</h1>
+
 <div class="row">
     {% for product in products %}
     <div class="col-md-4">
         <div class="card mb-4">
+
             <div class="card-body">
                 <h5 class="card-title">{{ product.name }}</h5>
                 {% if product.image %}
@@ -15,14 +19,20 @@
                 {% endif %}
                 <p class="card-text">{{ product.description|truncatewords:10 }}</p>
                 <p class="card-text"><strong>{{ product.price }}$</strong></p>
+                
                 <a href="{% url 'product_detail' product.id %}" class="btn btn-primary">View Details</a>
+
+
                 <form action="{% url 'product_delete' product.id %}" method="post" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
+
+
             </div>
         </div>
     </div>
+    
     {% endfor %}
 </div>
 {% endblock %}

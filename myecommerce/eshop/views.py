@@ -8,25 +8,19 @@ import logging
 logger=logging.getLogger(__name__)
 
 
-
+#@login_required
 def product_list(request):
     products=Product.objects.filter(available=True)
     return render(request,'eshop/product_list.html',{'products': products})
-
-
 
 def product_list_by_category(request,category_id):
     category=get_object_or_404(Category,id=category_id)
     products= category.products.filter(available=True)
     return render(request, 'eshop/product_list.html',{'category':category,'products':products})
 
-
-
 def product_detail(request,id):
     product=get_object_or_404(Product , id=id,available=True)
     return render(request,'eshop/product_detail.html',{'product':product})
-
-
 
 def add_product(request):
     if request.method == 'POST':
@@ -44,6 +38,27 @@ def add_product(request):
 
 
 
+
+
+def update_product(request, id):
+    product = get_object_or_404(Product, id=id)
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Ürün "{product.name}" başarıyla güncellendi.')
+            return redirect('product_detail', id=product.id)
+        else:
+            messages.error(request, 'Formda hata var. Lütfen kontrol edin.')
+    else:
+        form = ProductForm(instance=product)
+    return render(request, 'eshop/edit_product.html', {'form': form, 'product': product})
+
+
+
+
+
+
 def product_delete(request,id):
     product=get_object_or_404(Product,id=id)
     if request.method == 'POST':
@@ -53,13 +68,15 @@ def product_delete(request,id):
 
 
 
+
+
 def add_category(request):
     if request.method == 'POST':
         form=CategoryForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request,'Category added successfully.')
-            return redirect('product_list')
+            return redirect('category_list')
     else:
         form=CategoryForm()
     
@@ -67,11 +84,55 @@ def add_category(request):
 
 
 
+
+def category_list(request):
+    categories=Category.objects.all()
+    return render(request,'eshop/category_list.html',{'categories':categories})
+
+
+
+
+def category_detail(request,id):
+    category=get_object_or_404(Category,id=id)
+    return render(request,'eshop/category_detail.html',{'category':category})
+
+
+
+
+def edit_category(request, id):
+    category = get_object_or_404(Category, id=id)
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Kategori "{category.name}" güncellendi.')
+            return redirect('category_list_by_category', category_id=category.id)
+    else:
+        form = CategoryForm(instance=category)
+    return render(request, 'eshop/edit_category.html', {'form': form, 'category': category})
+
+
+
+
+
+
+def delete_category(request, id):
+    category = get_object_or_404(Category, id=id)
+    if request.method == 'POST':
+        category.delete()
+        messages.success(request, 'Kategori silindi.')
+        return redirect('category_list')
+    return redirect('category_list')
+
+
+
+
+
+
+
 def cart_detail(request):
     cart,created=Cart.objects.get_or_create(session_key=request.session.session_key)
     return render(request, 'eshop/cart_detail.html',{'cart':cart})
-
-
 
 def cart_add(request,product_id):
     cart,created =Cart.objects.get_or_create(session_key=request.session.session_key)
@@ -81,8 +142,6 @@ def cart_add(request,product_id):
     messages.success(request,'The product has been added to the cart.')
     return redirect('cart_detail')
 
-
-
 def cart_remove(request,product_id):
     cart=Cart.objects.get(session_key=request.session.session_key)
     product=get_object_or_404(Product,id=product_id)
@@ -90,8 +149,6 @@ def cart_remove(request,product_id):
     cart_item.delete()
     messages.success(request,'The product has been removed from the cart.')
     return redirect('cart_detail')
-
-
 
 def cart_update(request):
     if request.method == 'POST':
@@ -107,8 +164,6 @@ def cart_update(request):
                 messages.success(request, f'Updated quantity for {product.name}')
         return redirect('cart_detail')
     return redirect('cart_detail')
-
-
 
 def checkout(request):
     try:
@@ -143,13 +198,9 @@ def checkout(request):
     
     return render(request,'eshop/checkout.html',{'cart':cart,'form':form})
 
-
-
 def orders_list(request):
     orders=Order.objects.prefetch_related('items__product').all()
     return render(request,'eshop/orders_list.html',{'orders':orders})
-
-
 
 def register(request):
     if request.method == 'POST':
@@ -162,13 +213,11 @@ def register(request):
             if user is not None:
                 auth_login(request, user)
                 messages.success(request, f'Account created for {username}!')
-                return redirect('product_list')
+                return redirect('product_list')                                
     else:
         form = CustomUserCreationForm()  # only initialize here
     
     return render(request, 'eshop/register.html', {'form': form})
-
-
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -188,10 +237,8 @@ def login_view(request):
     
     return render(request, 'eshop/login.html', {'form': form})
 
-
-
 @login_required
 def logout_view(request):
     logout(request)
     messages.info(request,'You have been logged out.')
-    return redirect('product_list')
+    return redirect('product_list')                       

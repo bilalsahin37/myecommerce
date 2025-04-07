@@ -1,13 +1,20 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser,Group,Permission
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import Group, Permission
 from PIL import Image
+
+
 
 class Category(models.Model):
     name=models.CharField(max_length=100)
     description= models.TextField(blank=True, null=True)
     
     def __str__(self):
-        return self.name 
+        return self.name
+
+
+
+    
 
 class Product(models.Model):
     category=models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
@@ -28,6 +35,10 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+
+
+    
+
 class Cart(models.Model):
     session_key=models.CharField(max_length=40)
     created = models.DateTimeField(auto_now_add=True)
@@ -39,10 +50,18 @@ class Cart(models.Model):
     def get_total_cost(self):
         return sum(item.product.price * item.quantity for item in self.items.all())
 
+
+
+    
+
 class CartItem(models.Model):
     cart=models.ForeignKey(Cart,on_delete=models.CASCADE,related_name='items')
     product=models.ForeignKey(Product,on_delete=models.CASCADE)
     quantity=models.PositiveIntegerField(default=1)
+
+
+
+    
 
 class Order(models.Model):
     full_name=models.CharField(max_length=255)
@@ -56,6 +75,10 @@ class Order(models.Model):
     def __str__(self):
         return f'Order {self.id} by {self.full_name}'
 
+
+
+    
+
 class OrderItem(models.Model):
     order=models.ForeignKey(Order,related_name='items',on_delete=models.CASCADE)
     product=models.ForeignKey(Product,related_name='order_items',on_delete=models.CASCADE)
@@ -63,11 +86,14 @@ class OrderItem(models.Model):
     price=models.DecimalField(max_digits=10,decimal_places=2)
     
     def __str__(self):
-        return f'Order Item {self.id}'   
+        return f'Order Item {self.id}'
+
+
+
+    
     
 class CustomUser(AbstractUser):
     bio=models.TextField(max_length=500,blank=True)
     location=models.CharField(max_length=30,blank=True)
     groups=models.ManyToManyField(Group,related_name='custom_user_set',blank=True)
-    user_permissions = models.ManyToManyField(Permission,related_name='custom_user_set',blank=True)         
-       
+    user_permissions = models.ManyToManyField(Permission,related_name='custom_user_set',blank=True)

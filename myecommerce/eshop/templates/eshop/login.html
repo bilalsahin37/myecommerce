@@ -77,11 +77,17 @@
         }
     </style>
 </head>
+
+
+
 <body>
     <div class="container">
         <h1>Login</h1>
+
+
         <form method="post">
             {% csrf_token %}
+            
             <div class="form-group">
                 {{ form.username.label_tag }}
                 {{ form.username }}
@@ -89,6 +95,8 @@
                     <div class="text-danger">{{ form.username.errors }}</div>
                 {% endif %}
             </div>
+
+
             <div class="form-group">
                 {{ form.password.label_tag }}
                 {{ form.password }}
@@ -96,9 +104,13 @@
                     <div class="text-danger">{{ form.password.errors }}</div>
                 {% endif %}
             </div>
+
             <button type="submit">Login</button>
+
         </form>
         <p>Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
     </div>
+
+
 </body>
 </html>
