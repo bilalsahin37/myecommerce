@@ -51,7 +51,7 @@ class CustomUserChangeForm(forms.ModelForm):
         email=self.cleaned_data.get('email')
         if CustomUser.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("This email is already in use.")
-        return 
+        return email
 
 
 

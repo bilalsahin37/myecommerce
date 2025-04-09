@@ -1,7 +1,10 @@
 from django.urls import path
-from .views import product_list,product_list_by_category,product_detail,product_delete
-from .views import cart_detail,cart_add,cart_remove,cart_update,checkout
-from .views import register,login_view,logout_view,orders_list,add_product,add_category, category_list,edit_category,delete_category, category_detail
+from .views import product_list, product_list_by_category, product_detail,product_delete
+from .views import cart_detail,cart_add, cart_remove, cart_update,checkout
+from .views import register, login_view, logout_view, orders_list, add_product
+from .views import add_category, category_list, edit_category, delete_category, category_detail
+
+
 
 urlpatterns = [
     
@@ -12,20 +15,23 @@ urlpatterns = [
 
 
 
+
     
     path('register/',register,name='register'),
     path('login/',login_view,name='login'),
     path('logout/',logout_view,name='logout'),
-   
 
 
 
-    path('category/<int:category_id>/',product_list_by_category,name='product_list_by_category'),
+
+
     path('add-category/',add_category,name='add_category'),
-    path('categories/<int:id>/', category_detail, name='category_detail'),
+    path('category/<int:category_id>/',product_list_by_category,name='product_list_by_category'),
+    path('categories/<int:category_id>/', category_detail, name='category_detail'),
     path('categories/', category_list, name='category_list'),
     path('category/edit/<int:category_id>/', edit_category, name='edit_category'),
     path('category/delete/<int:category_id>/', delete_category, name='delete_category'),
+
 
 
     
